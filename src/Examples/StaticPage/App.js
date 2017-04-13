@@ -1,8 +1,11 @@
-import styles from '/Common/Style/App.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import AppStyle from '/Common/Style/App.scss';
+import OutputTreeView from './OutputTreeView';
+
+const App = () => (<OutputTreeView />);
 
 ReactDOM.render(
-  <div> Hello World!</div>,
+  <App />,
   document.getElementById('app')
 );

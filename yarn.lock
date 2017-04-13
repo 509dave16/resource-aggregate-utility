@@ -4235,6 +4235,10 @@ react-dom@^15.5.4:
     object-assign "^4.1.0"
     prop-types "~15.5.7"
 
+react-treeview@^0.4.6:
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/react-treeview/-/react-treeview-0.4.6.tgz#c4e5d209ab6dc736c4e8c51410d37821c41ce061"
+
 react@^15.5.4:
   version "15.5.4"
   resolved "https://registry.yarnpkg.com/react/-/react-15.5.4.tgz#fa83eb01506ab237cdc1c8c3b1cea8de012bf047"

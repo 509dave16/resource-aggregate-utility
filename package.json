@@ -17,7 +17,8 @@
   ],
   "dependencies": {
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-treeview": "^0.4.6"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.7",
