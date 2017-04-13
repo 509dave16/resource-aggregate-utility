@@ -15,7 +15,8 @@ import { jsonStringifyEquality, jsonCloneObject } from "/Utilities/JSONUtilities
  * @param {Object[]} storedResources 
  */
 const attemptToCreateAndStoreAggregateResource = (groupedResources, derivedAttrsCallback, type, order, storedResources) => {
-  if(groupedResources.length > 0 && type && order) {
+  const shouldCreateAndStoreResource = groupedResources.length > 0 && type && order;
+  if(shouldCreateAndStoreResource) {
     const derivedAttrs = derivedAttrsCallback(groupedResources, type);
     const aggregateResource = {};
     Object.assign(aggregateResource, jsonCloneObject(type), jsonCloneObject(order), jsonCloneObject(derivedAttrs));
@@ -48,11 +49,12 @@ export function aggregateAdjacentResources(resources, strategy) {
     const type = strategy.pluckTypeAttrs(resource);
     const order = strategy.pluckOrderAttrs(resource);
 
-    //2.a Resource is NOT one of the requiredTypes      
-    if (!strategy.isRequiredType(type)) {
+    //2.a Resource is NOT one of the requiredTypes
+    const resourceIsNotOfARequiredType = !strategy.isRequiredType(type);    
+    if (resourceIsNotOfARequiredType) {
       //2.a.i attempt to store grouped resources
       attemptToCreateAndStoreAggregateResource(groupedResources, strategy.derivedAttrsCallback, previousType, previousOrder, transformedResources);
-      //2.a.ii Also store the one we just came across that isn't a required type
+      //2.a.ii Also store the one we just came across that isn't of a required type
       transformedResources.push(jsonCloneObject(resource));
       //2.a.iii Reset the the grouped resources
       groupedResources = [];
@@ -60,13 +62,14 @@ export function aggregateAdjacentResources(resources, strategy) {
       // 2.b
       // If there was a previously visited valid resource
       // but the types are not equal then we need store
-      // the current resource group and then reset it 
-      if (previousResource !== undefined && !jsonStringifyEquality(type, previousType)) {
+      // the current resource group and then reset it
+      const currentResourceTypeDiffersFromPrevious = previousResource !== undefined && !jsonStringifyEquality(type, previousType);
+      if (currentResourceTypeDiffersFromPrevious) {
         attemptToCreateAndStoreAggregateResource(groupedResources, strategy.derivedAttrsCallback, previousType, previousOrder, transformedResources);
         groupedResources = []; //reset grouped resources
       }
 
-      // 2.c This is either the first or successive resource we are iterating over that's of a required type
+      // 2.c This is either the first or successive resource we are iterating over that's of the same required type
       groupedResources.push(resource);
       previousResource = resource;
     }
