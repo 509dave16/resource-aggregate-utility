@@ -1,0 +1,2 @@
+# Summary
+The **Utilities** folder will continue to evolve over time as I have not determined a **concrete** folder structure or naming schema for it yet. Things like services and pure function classes should be placed here. That's all I know for now.
