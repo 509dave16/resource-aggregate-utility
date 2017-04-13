@@ -1,4 +1,3 @@
-// NOTE: Phooey :| ! We need to have this file transformed by Webpack or Babel so that we can use es6 imports. Darn it!
 import { aggregateAdjacentResources } from '../ResourceAggregationUtility.js';
 
 // Don't need this yet setup yet

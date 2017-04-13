@@ -17,7 +17,6 @@ const cloneObject = (object) => {
  * @param {Object[]} storedResources 
  */
 const attemptToCreateAndStoreAggregateResource = (groupedResources, derivedAttrsCallback, type, order, storedResources) => {
-  //If group has more than 0 resources
   if(groupedResources.length > 0 && type && order) {
     const derivedAttrs = derivedAttrsCallback(groupedResources);
     const aggregateResource = {};
