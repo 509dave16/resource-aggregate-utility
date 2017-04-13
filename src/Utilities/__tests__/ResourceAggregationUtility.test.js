@@ -76,6 +76,48 @@ describe('aggregateAdjacentResources', () => {
     }
   ];
   test('the almighty test :) !!!', () => {
-    expect(aggregateAdjacentResources(inputResources, () => {}, {}, {})).toBe(output);
+
+    const jsonStringifyEquality = (objectA, objectB) => {
+      return JSON.stringify(objectA) === JSON.stringify(objectB);
+    }
+
+    const derivedAttrsCallback = (groupedResources) => {
+      const people = [];
+      groupedResources.forEach((resource) => {
+        people.push(resource.name);
+      });
+      return {
+        people
+      };
+    };
+
+    const orderSpec = {
+      pluckOrderAttrs: (resource) => {
+        const order = resource.order;
+        return { order };
+      },
+      compareOrderAttrs: (orderAttrsA, orderAttrsB) => {
+        return orderAttrsA.order - orderAttrsB.order;
+      },
+    };
+
+    const typeSpec = {
+      pluckTypeAttrs: (resource) => {
+        const type = resource.type;
+        return { type };
+      },
+      typeAttrsAreEqual: jsonStringifyEquality,
+      isRequiredType: (type) => {
+        const requiredTypes = [
+          { type: "Person" }
+        ]
+
+        return requiredTypes.some((otherType) => {
+          return jsonStringifyEquality(type, otherType);
+        })
+      },
+    }
+    
+    expect(aggregateAdjacentResources(inputResources, derivedAttrsCallback, orderSpec, typeSpec)).toEqual(output);
   });
 });
