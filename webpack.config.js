@@ -4,8 +4,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    //"bootstrap-loader",
-    "./src/App"
+    "./src/Examples/StaticPage/App.js" // change this to whatever example you want to build
   ],
   output: {
     path: `${__dirname}/build`,
