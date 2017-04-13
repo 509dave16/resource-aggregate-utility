@@ -1,10 +1,8 @@
 /**
- * Clone the object using Javscript's JSON API
- * @param {Object} object 
+ * @file Provides a cohesive set of utility functions for performing aggregate operations on a collection of resources
  */
-const cloneObject = (object) => {
-  return JSON.parse(JSON.stringify(object));
-}
+
+import { jsonStringifyEquality, jsonCloneObject } from "/Utilities/JSONUtilities.js"
 
 /**
  * Attempt to store grouped resources if there's more than one resource and the type is defined as well as the order
@@ -20,41 +18,42 @@ const attemptToCreateAndStoreAggregateResource = (groupedResources, derivedAttrs
   if(groupedResources.length > 0 && type && order) {
     const derivedAttrs = derivedAttrsCallback(groupedResources);
     const aggregateResource = {};
-    Object.assign(aggregateResource, cloneObject(type), cloneObject(order), cloneObject(derivedAttrs));
+    Object.assign(aggregateResource, jsonCloneObject(type), jsonCloneObject(order), jsonCloneObject(derivedAttrs));
     storedResources.push(aggregateResource);
   }
 }
 
 /**
  * This function aggregates adjacent resources of the same type in a post sorted Array
- * @param {Object[]} resources 
- * @param {Function} derivedAttrsCallback - (groupedResources) => aggregateResource 
- * @param {Object} orderSpec - { pluckOrderAttrs(resource), compareOrderAttrs(orderAttrsA, orderAttrsB) }
- * @param {Object} typeSpec - { pluckTypeAttrs(resource), typeAttrsAreEqual(typeAttrsA, typeAttrsB), requiredTypes[] }
+ * based on the strategy provided which is comprised of two concepts: type and order.
+ * @see {@link Strategies/AggregateAdjacentResources/PersonStrategy.js}
+ * @param {Array<Object>} resources 
+ * @param {Object} strategy
+ * @return {Array<Object>} - transformed collection of resources of which some or all are aggregate resources
  */
-export function aggregateAdjacentResources(resources, derivedAttrsCallback, orderSpec, typeSpec) {
+export function aggregateAdjacentResources(resources, strategy) {
   // Define function level scoped variables that will be used throughout the iteration process
   let previousResource, groupedResources = [], previousOrder, previousType;
   const transformedResources = [];
   
-  // 1. Sort the resources using the orderSpec
+  // 1. Sort the resources using the strategy
   const sortedResources = resources.sort((resourceA, resourceB) => {
-    const resourceAOrderAttrs = orderSpec.pluckOrderAttrs(resourceA);
-    const resourceBOrderAttrs = orderSpec.pluckOrderAttrs(resourceB);
-    return orderSpec.compareOrderAttrs(resourceAOrderAttrs, resourceBOrderAttrs);
+    const resourceAOrderAttrs = strategy.pluckOrderAttrs(resourceA);
+    const resourceBOrderAttrs = strategy.pluckOrderAttrs(resourceB);
+    return strategy.orderAttrsComparator(resourceAOrderAttrs, resourceBOrderAttrs);
   });
 
   // 2. Iterate over the sorted resources array like so
   sortedResources.forEach((resource) => {
-    const type = typeSpec.pluckTypeAttrs(resource);
-    const order = orderSpec.pluckOrderAttrs(resource);
+    const type = strategy.pluckTypeAttrs(resource);
+    const order = strategy.pluckOrderAttrs(resource);
 
     //2.a Resource is NOT one of the requiredTypes      
-    if (!typeSpec.isRequiredType(type)) {
+    if (!strategy.isRequiredType(type)) {
       //2.a.i attempt to store grouped resources
-      attemptToCreateAndStoreAggregateResource(groupedResources, derivedAttrsCallback, previousType, previousOrder, transformedResources);
+      attemptToCreateAndStoreAggregateResource(groupedResources, strategy.derivedAttrsCallback, previousType, previousOrder, transformedResources);
       //2.a.ii Also store the one we just came across that isn't a required type
-      transformedResources.push(cloneObject(resource));
+      transformedResources.push(jsonCloneObject(resource));
       //2.a.iii Reset the the grouped resources
       groupedResources = [];
     } else {
@@ -62,8 +61,8 @@ export function aggregateAdjacentResources(resources, derivedAttrsCallback, orde
       // If there was a previously visited valid resource
       // but the types are not equal then we need store
       // the current resource group and then reset it 
-      if (previousResource !== undefined && !typeSpec.typeAttrsAreEqual(type, previousType)) {
-        attemptToCreateAndStoreAggregateResource(groupedResources, derivedAttrsCallback, previousType, previousOrder, transformedResources);
+      if (previousResource !== undefined && !jsonStringifyEquality(type, previousType)) {
+        attemptToCreateAndStoreAggregateResource(groupedResources, strategy.derivedAttrsCallback, previousType, previousOrder, transformedResources);
         groupedResources = []; //reset grouped resources
       }
 
@@ -73,11 +72,11 @@ export function aggregateAdjacentResources(resources, derivedAttrsCallback, orde
     }
 
     // 2.d Update the previousType and previousOrder based on what has changed with the previousResource
-    previousType = previousResource ? typeSpec.pluckTypeAttrs(previousResource) : undefined;
-    previousOrder = previousResource ? orderSpec.pluckOrderAttrs(previousResource) : undefined;
+    previousType = previousResource ? strategy.pluckTypeAttrs(previousResource) : undefined;
+    previousOrder = previousResource ? strategy.pluckOrderAttrs(previousResource) : undefined;
   });
 
   // 3. In case we ended without seeing a different type or non-valid type lets store what's left
-  attemptToCreateAndStoreAggregateResource(groupedResources, derivedAttrsCallback, previousType, previousOrder, transformedResources);
+  attemptToCreateAndStoreAggregateResource(groupedResources, strategy.derivedAttrsCallback, previousType, previousOrder, transformedResources);
   return transformedResources;
 }
