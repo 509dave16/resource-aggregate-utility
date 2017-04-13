@@ -16,7 +16,7 @@ import { jsonStringifyEquality, jsonCloneObject } from "/Utilities/JSONUtilities
  */
 const attemptToCreateAndStoreAggregateResource = (groupedResources, derivedAttrsCallback, type, order, storedResources) => {
   if(groupedResources.length > 0 && type && order) {
-    const derivedAttrs = derivedAttrsCallback(groupedResources);
+    const derivedAttrs = derivedAttrsCallback(groupedResources, type);
     const aggregateResource = {};
     Object.assign(aggregateResource, jsonCloneObject(type), jsonCloneObject(order), jsonCloneObject(derivedAttrs));
     storedResources.push(aggregateResource);

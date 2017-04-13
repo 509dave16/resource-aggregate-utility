@@ -6,18 +6,26 @@
 import { jsonStringifyEquality } from "/Utilities/JSONUtilities.js"
 
 /**
+ * NOTE: this is the only supported type for resources being processed using this strategy!!!
+ */
+const personType = { type: "Person" }
+
+
+/**
  * Produces the derived attributes for a group of resources
  * @param {Array<Object>} groupedResources
  * @return {Object} - derived attributes that should be attached to an aggregate resource
  */
-const derivedAttrsCallback = (groupedResources) => {
-  const people = [];
-  groupedResources.forEach((resource) => {
-    people.push(resource.name);
-  });
-  return {
-    people
-  };
+const derivedAttrsCallback = (groupedResources, type) => {
+  if (jsonStringifyEquality(type, personType)) {
+    const people = [];
+    groupedResources.forEach((resource) => {
+      people.push(resource.name);
+    });
+    return {
+      people
+    };
+  }
 };
 
 //NOTE: whatever order attrs you pluck are what's passed to compareOrderAttrs!!!
