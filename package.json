@@ -7,7 +7,7 @@
     "test": "jest",
     "start": "webpack-dev-server -d --content-base build/ --inline --hot",
     "sync": "node browsersync.js",
-    "deploy": "firebase deploy",
+    "deploy": "webpack -p && firebase deploy",
     "build": "webpack -p"
   },
   "keywords": [
