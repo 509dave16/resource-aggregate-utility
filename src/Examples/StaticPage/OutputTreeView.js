@@ -5,11 +5,11 @@
  * @see {@link https://github.com/chenglou/react-treeview/blob/master/demos/uncontrolled.js} for source that is component is based off of.
  */
 
-
 import React from 'react';
 import TreeView from 'react-treeview';
 //NOTE: Have to use relevative path for import since the css file is in a node_modules/ package folder and not one of the folders under src/
 import TreeViewStyle from '../../../node_modules/react-treeview/react-treeview.css';
+import OutputTreeViewStyle from './OutputTreeView.scss';
 // Import Business Logic Crap
 import { aggregateAdjacentResources } from '/Utilities/ResourceAggregation/ResourceAggregationUtility.js';
 import strategy from '/Utilities/ResourceAggregation/Strategies/AggregateAdjacentResources/PersonStrategy.js';
@@ -32,9 +32,9 @@ const OutputTreeView = () => (
   <div>
     {dataSource.map((node, nodeIndex) => {
       const type = node.type;
-      const rootLabel = <span className="node">{type}</span>;
+      const rootLabel = <span className="node itemLabel">{type}</span>;
       return (
-        <TreeView key={`${type}|${nodeIndex}`} nodeLabel={rootLabel} defaultCollapsed={false}>
+        <TreeView className="itemNode" key={`${type}|${nodeIndex}`} nodeLabel={rootLabel} defaultCollapsed={false}>
           {node.collection.map(item => {
             let itemNodeName = '';
             if (item.name) {
@@ -42,11 +42,19 @@ const OutputTreeView = () => (
             } else {
               itemNodeName = item.people.join();
             }
-            const itemLabel = <span className="node">{`${item.order}. ${itemNodeName}`}</span>;
+            const itemLabel = <span className="node itemLabel">{`${item.order}. ${itemNodeName}`}</span>;
             return (
-              <TreeView nodeLabel={itemLabel} key={`${item.type}|${item.order}`} defaultCollapsed={true}>
-                <div className="info">type: {item.type}</div>
-                <div className="info">order: {item.order}</div>
+              <TreeView className="itemNode" nodeLabel={itemLabel} key={`${item.type}|${item.order}`} defaultCollapsed={false}>
+                <div className="itemProperties">
+                  <div className="info">
+                    <span>type:</span>
+                    <span>{item.type}</span>
+                  </div>
+                  <div className="info">
+                    <span>order:</span>
+                    <span>{item.order}</span>
+                  </div>
+                </div>
               </TreeView>
             );
           })}
