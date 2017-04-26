@@ -5,17 +5,22 @@
 # Design - Initial Draft Complete :boom:
 Please refer to this [wiki page](https://github.com/509dave16/resource-aggregate-utility/wiki/Design) for information on the design which includes the topics: **Notes**, **Approach Tasks**, **Utility Function Specs**, **Utility Function Unit Tests**.
 
+# Package Management
+1. Make sure you have Node v6.0.0 or later installed
+2. Install `yarn` using the following command: ```npm install -g yarn```
+3. Run the following to install all of the packages: ```yarn```
+
 # Deployment 
 ```
 npm run deploy
 ```
 
-# Bundling - Prod
+# Bundling for Production
 ```
 npm run build
 ```
 
-# Local Development Server
+# Run Local Development Server
 ```
 npm start
 ```
@@ -24,9 +29,6 @@ npm start
 ```
 npm test
 ```
-
-# Package Manager
-Yarn. That's all I have to say for now.
 
 # Package Stack
 Please refer to this [wiki page](https://github.com/509dave16/resource-aggregate-utility/wiki/Package-Stack)
